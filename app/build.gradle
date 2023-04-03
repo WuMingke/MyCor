@@ -48,4 +48,12 @@ dependencies {
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0'
 
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.0-Beta")
+
+    implementation "androidx.lifecycle:lifecycle-runtime-ktx:2.5.1" // lifecycleScope
+
+    implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.1" // viewModelScope
+
+    implementation "androidx.activity:activity-ktx:1.7.0" // viewModels()
+
+
 }
