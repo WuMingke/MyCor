@@ -1,5 +1,6 @@
 package com.example.mycor
 
+import android.content.pm.ResolveInfo
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
@@ -34,7 +35,7 @@ class MainActivity : AppCompatActivity() {
 //            do3()
 //            do4()
 //            do5()
-//            do6()
+            do6()
 //            do7()
 //            do8()
 
@@ -45,7 +46,8 @@ class MainActivity : AppCompatActivity() {
 //            do15()
 //            do16()
 //            do17()
-            do18()
+//            do18()
+
         }
 
     }
