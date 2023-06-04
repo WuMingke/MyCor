@@ -4,11 +4,14 @@ import android.os.Bundle
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import com.example.mycor.R
+import java.util.Collections
 import java.util.concurrent.CountDownLatch
+import java.util.concurrent.FutureTask
 import java.util.concurrent.LinkedBlockingQueue
 import java.util.concurrent.ThreadPoolExecutor
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.locks.ReentrantLock
+import kotlin.concurrent.thread
 
 class ThreadActivity : AppCompatActivity() {
 
@@ -26,7 +29,50 @@ class ThreadActivity : AppCompatActivity() {
 //        shutdownTest()
 //        taskCountTest()
 //        countDownLatchTest()
-        staticCountTest()
+//        staticCountTest()
+
+//        testHashMap()
+
+//        testSyc()
+
+        testSync()
+    }
+
+
+
+
+
+
+
+
+    private fun testSync() {
+        val task1 = FutureTask { "Task1 " }
+        val task2 = FutureTask { "Task2 " }
+        val task3 = FutureTask { "Task3 " }
+        val t1 = Thread(task1)
+        val t2 = Thread(task2)
+        val t3 = Thread(task3)
+        t3.start()
+        t1.start()
+        t2.start()
+        Log.i("wmkwmk== ", "执行 : ${task1.get()},${task2.get()},${task3.get()}")
+    }
+
+    private fun testSyc() {
+        val t1 = thread {
+            Log.i("wmkwmk== ", "执行 : 1")
+        }
+        t1.join()
+        val t2 = thread {
+            Log.i("wmkwmk== ", "执行 : 2")
+        }
+        t2.join()
+        val t3 = thread {
+            Log.i("wmkwmk== ", "执行 : 3")
+        }
+        t3.join()
+
+
     }
 
     private fun shutdownTest() {
@@ -95,6 +141,20 @@ class ThreadActivity : AppCompatActivity() {
         Log.i("wmkwmk== ", "全部执行完毕")
 
         /// 加锁计数，
+    }
+
+    private fun testHashMap() {
+//        val lock = ReentrantLock()
+
+        val map = hashMapOf<Int, Int>()
+        val temp = Collections.synchronizedMap(map)
+        temp[1] = 0
+        repeat(100) {
+            pool.execute {
+                temp[1] = temp[1]!!.plus(1)
+                Log.i("wmkwmk== ", "执行 : ${map[1]}")
+            }
+        }
     }
 
 }
