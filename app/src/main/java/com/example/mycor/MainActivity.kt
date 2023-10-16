@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.util.Log
 import android.widget.Button
 import androidx.activity.viewModels
+import androidx.lifecycle.LifecycleCoroutineScope
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
@@ -14,6 +15,8 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.consumeEach
 import kotlinx.coroutines.channels.produce
 import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.selects.select
+import kotlin.coroutines.ContinuationInterceptor
 import kotlin.system.measureTimeMillis
 
 class MainActivity : AppCompatActivity() {
@@ -52,6 +55,14 @@ class MainActivity : AppCompatActivity() {
 
     }
 
+    private fun do19() {
+        lifecycleScope.launch {
+            val result = select<String> {
+
+            }
+        }
+    }
+
     // SharedFlow
     class TestSharedFlowViewModel : ViewModel() {
         private val _state: MutableSharedFlow<Int> = MutableSharedFlow(2)
@@ -63,6 +74,40 @@ class MainActivity : AppCompatActivity() {
                     _state.emit(state)
                 }
             }
+
+            /************标准做法**************/
+            // 1
+            // 绑定生命周期
+            val job = viewModelScope.launch(Dispatchers.IO) {
+                // IO操作
+                withContext(Dispatchers.Main) {
+                    // UI操作
+                }
+            }
+            // 随时取消
+            job.cancel() // 支持取消，实际是阻止进入下一个suspend方法，正在执行的代码块会走完
+
+            // 2
+            viewModelScope.launch(Dispatchers.IO) {
+                // 并发请求
+                val deferred1 = async { /* 网络请求 */ }
+                val deferred2 = async { /* 网络请求 */ }
+                val result1 = deferred1.await()
+                val result2 = deferred2.await()
+                // 处理两个请求
+            }
+            /************标准做法**************/
+            /**
+             * CoroutineDispatcher 都实现了 ContinuationInterceptor，
+             * 通过拦截 resumeWith 实现分发任务到指定线程 or 线程池
+             * 最简单的 HandlerDispatcher ，通过 handler 去切换线程
+             *
+             * 如何做到挂起回调=》续体+状态机（resumeWith，label+1）
+             * 父子协程如何联动=》
+             * 如何做到减少线程切换、减少闲置线程=》CoroutineScheduler
+             * 1 减少线程切换：执行线程<=CPU核心数，由controlState中CpuPermits数量控制
+             * 2 减少闲置线程：偷任务，当前线程如果获取不到任务，则会从其它线程中偷任务 （WorkQueue）
+             */
         }
     }
 
